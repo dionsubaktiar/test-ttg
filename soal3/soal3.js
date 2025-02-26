@@ -16,8 +16,8 @@ function cariYangHilang(array) {
     : "Array valid: Tidak ada angka yang hilang.";
 }
 
-console.log(cariYangHilang([1, 2, 3, 4, 7])); // ❌ Error: Lompat dari 4 ke 7
-console.log(cariYangHilang([1, 2, 3, 4, 6])); // ✅ Angka yang hilang: 5
-console.log(cariYangHilang([10, 11, 12, 15])); // ❌ Error: Lompat dari 12 ke 15
-console.log(cariYangHilang([100, 101, 103, 105])); // ✅ Angka yang hilang: 102, 104
-console.log(cariYangHilang([5, 6, 7, 8])); // ✅ Tidak ada angka yang hilang
+console.log(cariYangHilang([1, 2, 3, 4, 7]));
+console.log(cariYangHilang([1, 2, 3, 4, 6]));
+console.log(cariYangHilang([10, 11, 12, 15]));
+console.log(cariYangHilang([100, 101, 103, 105]));
+console.log(cariYangHilang([5, 6, 7, 8]));
