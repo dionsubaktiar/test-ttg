@@ -31,7 +31,7 @@
       <form id="registerForm">
         <input
           type="text"
-          id="fullname"
+          id="name"
           placeholder="Nama Lengkap"
           required
           class="w-full p-2 mb-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
@@ -79,7 +79,7 @@
         .addEventListener("submit", async function (event) {
           event.preventDefault();
 
-          let fullname = document.getElementById("fullname").value;
+          let name = document.getElementById("name").value;
           let email = document.getElementById("email").value;
           let password = document.getElementById("password").value;
           let confirmPassword =
@@ -125,7 +125,7 @@
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                name: fullname,
+                name: name,
                 email: email,
                 password: password,
                 confirmPassword: confirmPassword,
