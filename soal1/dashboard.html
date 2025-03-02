@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+      };
+    </script>
+  </head>
+  <body class="flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-6">
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Anda harus login terlebih dahulu!");
+        window.location.href = "login.html";
+      }
+    </script>
+
+    <div class="absolute top-4 right-4">
+      <button
+        id="logoutButton"
+        class="ml-2 p-2 bg-red-500 text-white rounded-md"
+      >
+        🚪 Logout
+      </button>
+      <button
+        id="darkModeToggle"
+        class="p-2 bg-gray-300 dark:bg-gray-700 text-black dark:text-white rounded-md"
+      >
+        🌙
+      </button>
+    </div>
+    <div
+      class="bg-white dark:bg-gray-800 p-6 m-2 rounded-lg shadow-md w-full max-w-4xl"
+    >
+      <h2
+        class="text-2xl font-semibold mb-4 text-black dark:text-white text-center"
+      >
+        Dashboard
+      </h2>
+      <p class="text-center text-sm mt-2 text-gray-700 dark:text-gray-300">
+        Selamat datang di dashboard!
+      </p>
+
+      <div class="overflow-x-auto mt-4">
+        <table
+          class="min-w-full border-collapse border border-gray-300 dark:border-gray-700"
+        >
+          <thead>
+            <tr class="bg-gray-200 dark:bg-gray-700 dark:text-white">
+              <th class="border p-2">No</th>
+              <th class="border p-2">Nama</th>
+              <th class="border p-2">Email</th>
+              <th class="border p-2">Aksi</th>
+            </tr>
+          </thead>
+          <tbody
+            id="userTable"
+            class="bg-white dark:bg-gray-800 dark:text-white"
+          ></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div
+      id="editPopup"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
+    >
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-96">
+        <h2 class="text-xl font-semibold mb-2 dark:text-gray-300">
+          Edit Pengguna
+        </h2>
+        <form id="editForm">
+          <input type="hidden" id="editId" />
+          <label class="block text-gray-700 dark:text-gray-300">Nama</label>
+          <input
+            type="text"
+            id="editName"
+            class="w-full p-2 mb-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
+            required
+          />
+          <label class="block text-gray-700 dark:text-gray-300">Email</label>
+          <input
+            type="email"
+            id="editEmail"
+            class="w-full p-2 mb-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
+            required
+          />
+          <button
+            type="submit"
+            class="mt-4 px-4 py-2 bg-green-500 text-white rounded"
+          >
+            Simpan
+          </button>
+          <button
+            type="button"
+            id="closeEditPopup"
+            class="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+          >
+            Tutup
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Popup Detail Pengguna -->
+    <div
+      id="detailPopup"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
+    >
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-96">
+        <h2 class="text-xl font-semibold mb-2 text-black dark:text-white">
+          Detail Pengguna
+        </h2>
+        <p id="detailId" class="text-gray-700 dark:text-gray-300"></p>
+        <p id="detailName" class="text-gray-700 dark:text-gray-300"></p>
+        <p id="detailEmail" class="text-gray-700 dark:text-gray-300"></p>
+        <button
+          id="closeDetailPopup"
+          class="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+
+    <script>
+      window.showUser = async (id) => {
+        try {
+          let response = await fetch(`http://localhost:2000/users/${id}`, {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Gagal mengambil data pengguna");
+          }
+
+          let user = await response.json();
+          console.log(user);
+          document.getElementById("detailId").textContent = `ID: ${user.id}`;
+          document.getElementById(
+            "detailName"
+          ).textContent = `Nama: ${user.name}`;
+          document.getElementById(
+            "detailEmail"
+          ).textContent = `Email: ${user.email}`;
+          document.getElementById("detailPopup").classList.remove("hidden");
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Terjadi kesalahan saat mengambil data pengguna.");
+        }
+      };
+
+      document
+        .getElementById("closeDetailPopup")
+        .addEventListener("click", () => {
+          document.getElementById("detailPopup").classList.add("hidden");
+        });
+    </script>
+
+    <script>
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      const html = document.documentElement;
+
+      darkModeToggle.addEventListener("click", () => {
+        html.classList.toggle("dark");
+        localStorage.setItem(
+          "theme",
+          html.classList.contains("dark") ? "dark" : "light"
+        );
+      });
+
+      if (localStorage.getItem("theme") === "dark") {
+        html.classList.add("dark");
+      }
+
+      const fetchUsers = async () => {
+        try {
+          let response = await fetch("http://localhost:2000/users", {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          });
+          let users = await response.json();
+          const userTable = document.getElementById("userTable");
+          userTable.innerHTML = "";
+
+          users.forEach((user, index) => {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+              <td class="p-2 border text-center">${index + 1}</td>
+              <td class="p-2 border">${user.name}</td>
+              <td class="p-2 border">${user.email}</td>
+              <td class="p-2 border text-center">
+                <button onClick="showUser('${
+                  user.id
+                }')" class="px-2 py-1 bg-blue-500 text-white rounded">👁️</button>
+                <button onclick="editUser('${user.id}', '${user.name}', '${
+              user.email
+            }')" class="px-2 py-1 bg-yellow-500 text-white rounded">✏️</button>
+                <button onclick="deleteUser('${
+                  user.id
+                }')" class="px-2 py-1 bg-red-500 text-white rounded">🗑️</button>
+              </td>
+            `;
+            userTable.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Gagal memuat data", error);
+        }
+      };
+
+      window.editUser = (id, name, email) => {
+        document.getElementById("editId").value = id;
+        document.getElementById("editName").value = name;
+        document.getElementById("editEmail").value = email;
+        document.getElementById("editPopup").classList.remove("hidden");
+      };
+
+      document
+        .getElementById("editForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const id = document.getElementById("editId").value;
+          const name = document.getElementById("editName").value;
+          const email = document.getElementById("editEmail").value;
+
+          try {
+            await fetch(`http://localhost:2000/users/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + localStorage.getItem("token"),
+              },
+              body: JSON.stringify({ name, email }),
+            });
+            document.getElementById("editPopup").classList.add("hidden");
+            fetchUsers();
+          } catch (error) {
+            console.error("Gagal mengupdate data", error);
+          }
+        });
+
+      window.deleteUser = async (id) => {
+        if (confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
+          try {
+            await fetch(`http://localhost:2000/users/${id}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+              },
+            });
+            fetchUsers();
+          } catch (error) {
+            console.error("Gagal menghapus pengguna", error);
+          }
+        }
+      };
+
+      document
+        .getElementById("closeEditPopup")
+        .addEventListener("click", () => {
+          document.getElementById("editPopup").classList.add("hidden");
+        });
+
+      fetchUsers();
+
+      document.getElementById("logoutButton").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        alert("Anda telah logout!");
+        window.location.href = "login.html";
+      });
+    </script>
+  </body>
+</html>
