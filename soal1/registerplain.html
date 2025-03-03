@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Pendaftaran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+      };
+    </script>
+  </head>
+  <body
+    class="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900"
+  >
+    <div class="absolute top-4 right-4">
+      <button
+        id="darkModeToggle"
+        class="p-2 bg-gray-300 dark:bg-gray-700 text-black dark:text-white rounded-md"
+      >
+        🌙
+      </button>
+    </div>
+    <div
+      class="bg-white dark:bg-gray-800 p-6 m-2 rounded-lg shadow-md w-full max-w-md"
+    >
+      <h2 class="text-2xl font-semibold mb-4 text-black dark:text-white">
+        Form Pendaftaran
+      </h2>
+      <form id="registerForm">
+        <input
+          type="text"
+          id="name"
+          placeholder="Nama Lengkap"
+          required
+          class="w-full p-2 mb-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
+        />
+        <input
+          type="email"
+          id="email"
+          placeholder="Email"
+          required
+          class="w-full p-2 mb-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
+        />
+        <span class="text-red-500 text-sm" id="emailError"></span>
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          required
+          class="w-full p-2 mb-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
+        />
+        <span class="text-red-500 text-sm" id="passwordError"></span>
+        <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Konfirmasi Password"
+          required
+          class="w-full p-2 mb-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
+        />
+        <span class="text-red-500 text-sm" id="confirmPasswordError"></span>
+        <button
+          type="submit"
+          class="w-full p-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+        >
+          Daftar
+        </button>
+      </form>
+      <p class="text-center text-sm mt-2 text-gray-700 dark:text-gray-300">
+        Sudah punya akun?
+        <a href="login.html" class="text-blue-500 hover:underline">Masuk</a>
+      </p>
+      <p class="text-green-500 text-sm mt-2 hidden" id="successMessage">
+        Pendaftaran Berhasil
+      </p>
+      <p class="text-red-500 text-sm mt-2 hidden" id="errorMessage"></p>
+    </div>
+
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          let name = document.getElementById("name").value;
+          let email = document.getElementById("email").value;
+          let password = document.getElementById("password").value;
+          let confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          let emailError = document.getElementById("emailError");
+          let passwordError = document.getElementById("passwordError");
+          let confirmPasswordError = document.getElementById(
+            "confirmPasswordError"
+          );
+          let successMessage = document.getElementById("successMessage");
+          let errorMessage = document.getElementById("errorMessage");
+
+          emailError.textContent = "";
+          passwordError.textContent = "";
+          confirmPasswordError.textContent = "";
+          successMessage.classList.add("hidden");
+          errorMessage.classList.add("hidden");
+
+          let valid = true;
+          let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          if (!emailPattern.test(email)) {
+            emailError.textContent = "Format email tidak valid";
+            valid = false;
+          }
+          if (password.length < 8) {
+            passwordError.textContent = "Password minimal 8 karakter";
+            valid = false;
+          }
+          if (password !== confirmPassword) {
+            confirmPasswordError.textContent = "Password tidak cocok";
+            valid = false;
+          }
+
+          if (!valid) return;
+
+          try {
+            let response = await fetch("http://localhost:2000/plainsql", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name: name,
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword,
+              }),
+            });
+
+            let result = await response.json();
+
+            if (response.ok) {
+              successMessage.textContent = "Pendaftaran Berhasil!";
+              successMessage.classList.remove("hidden");
+            } else {
+              errorMessage.textContent =
+                result.error || "Terjadi kesalahan saat mendaftar.";
+              errorMessage.classList.remove("hidden");
+            }
+          } catch (error) {
+            errorMessage.textContent = "Gagal menghubungi server.";
+            errorMessage.classList.remove("hidden");
+          }
+        });
+
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      const html = document.documentElement;
+
+      darkModeToggle.addEventListener("click", () => {
+        html.classList.toggle("dark");
+        localStorage.setItem(
+          "theme",
+          html.classList.contains("dark") ? "dark" : "light"
+        );
+      });
+
+      if (localStorage.getItem("theme") === "dark") {
+        html.classList.add("dark");
+      }
+    </script>
+  </body>
+</html>
