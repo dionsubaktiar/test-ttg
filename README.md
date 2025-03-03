@@ -12,7 +12,8 @@
 
 ## Cara Menjalankan Program
 1. **Frontend:**
-   - Buka file HTML di browser.
+   - Buka file soal1.html di browser untuk menjalankan ExpressJS + Prisma ORM.
+   - Buka file registerplain.html di browser untuk menjalankan Vanilla ExpressJS.
 
 2. **Backend:**
    - Install dependency dengan menjalankan:
@@ -31,11 +32,20 @@
 
 ## Endpoint
 Terdapat dua varian Express yang tersedia:
-1. **Prisma ORM + Express** dapat diakses di:
+1. **Prisma ORM + Express** (menggunakan token) dapat diakses di:
    ```
    http://localhost:2000/users
    ```
-2. **Vanilla Express (tanpa ORM)** dapat diakses di:
+   Sebelum mengakses link diatas dimohon untuk register di:
+   ```
+   http://localhost:2000/users/register
+   ```
+   Untuk login dapat dilakukan melalui :
+    ```
+   http://localhost:2000/users/login
+   ```
+   Atau dapat mengakses dengan membuka soal1.html pada folder soal1.
+3. **Vanilla Express (tanpa ORM)** dapat diakses di:
    ```
    http://localhost:2000/plainsql
    ```
